@@ -1,54 +1,45 @@
 package com.example.rashid.Book.Manangment.Controller;
 
-import com.example.rashid.Book.Manangment.dto.AuthorDTO;
+import com.example.rashid.Book.Manangment.Service.BookService;
 import com.example.rashid.Book.Manangment.dto.BookDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.awt.print.Book;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/book")
 public class BookController {
-    @Autowired
-    BookDTO bookDTO;
+    private final BookService bookService;
 
-    @GetMapping()
-    public BookDTO getBook() {
-        return new BookDTO(1,"White Nights","Classis", LocalDateTime.of(2000,12,02,20,20));
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
     }
 
     @GetMapping()
     public List<BookDTO> getAllBooks(){
-        List<BookDTO> authors = new ArrayList<>();
-        authors.add(new BookDTO(1,"White Nights","Classis", LocalDateTime.of(2000,12,02,20,20)));
-        authors.add( new BookDTO(1,"White Nights","Classis", LocalDateTime.of(2000,12,02,20,20)));
-        return authors;
+        return  bookService.getAllBook();
     }
 
 
     @GetMapping("/{id}")
     public BookDTO getBookById(@PathVariable(name = "id") long id){
-        return new BookDTO(1,"White Nights","Classis", LocalDateTime.of(2000,12,02,20,20));
+        return bookService.getBookById(id);
     }
 
     @GetMapping("/author")
-    public BookDTO getBookByAuthor(@PathVariable(name = "author") String author){
-        return new BookDTO(1,"White Nights","Classis", LocalDateTime.of(2000,12,02,20,20));
+    public List<BookDTO> getBookByAuthor(@PathVariable(name = "author") String author){
+        return bookService.getBookByAuthor(author);
     }
 
     @PostMapping
     public BookDTO createNewBook(@RequestBody BookDTO bookDTO ){
-        return bookDTO;
+        return bookService.save(bookDTO);
     }
 
     @PatchMapping("/{id}")
     public BookDTO patchBook(@PathVariable(name = "id") long id, @RequestBody Map<String,Object> updates){
-        BookDTO bookDTO = new BookDTO(1,"White Nights","Classis", LocalDateTime.of(2000,12,02,20,20));
+        BookDTO bookDTO = getBookById(id);
 
         if(updates.containsKey("id"))
             bookDTO.setId((Long) updates.get("id"));
@@ -59,25 +50,22 @@ public class BookController {
         if(updates.containsKey("publishedOn"))
             bookDTO.setPublishedOn((LocalDateTime) updates.get("publishedOn"));
 
-        return bookDTO;
+        return bookService.save(bookDTO);
     }
 
-    @PutMapping("/{id}")
+    @DeleteMapping("/{id}")
     public boolean deleteBook(@PathVariable(name = "id") Long id){
-        return true;
+        return bookService.deleteById(id);
     }
 
     @GetMapping("/{title}")
     public BookDTO findBookByTitle(@PathVariable(name = "title") String title){
-        return new BookDTO(1,title,"Classis", LocalDateTime.of(2000,12,02,20,20));
+        return bookService.findByTitle(title);
     }
 
     @GetMapping("{publishedAfter}")
-    public List<BookDTO> getAllBookPublishedAfter(@PathVariable(name = "publishedAfter") LocalDateTime publishedAfter){
-        List<BookDTO> authors = new ArrayList<>();
-        authors.add(new BookDTO(1,"White Nights","Classis", LocalDateTime.of(2000,12,02,20,20)));
-        authors.add( new BookDTO(1,"White Nights","Classis", LocalDateTime.of(2020,12,02,20,20)));
-        return authors;
+    public List<BookDTO> findByPublishedOnAfter(@PathVariable(name = "publishedAfter") LocalDateTime publishedAfter){
+        return bookService.findByPublishedOnAfter(publishedAfter);
     }
 
 }

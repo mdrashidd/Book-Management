@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class BookDTO {
-    private long id;
+    private Long id;
     private String title;
     private String theme;
     private LocalDateTime publishedOn;

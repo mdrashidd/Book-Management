@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 @Setter
 @Builder
 public class AuthorDTO {
-    private long id;
+    private Long id;
     private String name;
 }

@@ -1,11 +1,9 @@
 package com.example.rashid.Book.Manangment.Controller;
 
 
+import com.example.rashid.Book.Manangment.Service.AuthorService;
 import com.example.rashid.Book.Manangment.dto.AuthorDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,41 +11,42 @@ import java.util.Map;
 @RequestMapping("/author")
 public class AuthorController {
 
-    @Autowired
-    AuthorDTO authorDTO;
+   private final AuthorService authorService;
+
+    public AuthorController(AuthorService authorService) {
+        this.authorService = authorService;
+    }
 
     @PostMapping()
-    public AuthorDTO createAuthor(@RequestBody AuthorDTO authorDTO){
-        return authorDTO;
+    public AuthorDTO save(@RequestBody AuthorDTO authorDTO){
+        return authorService.save(authorDTO);
     }
 
     @GetMapping()
-    public List<AuthorDTO> getAllAuthor(){
-        List<AuthorDTO> authors = new ArrayList<>();
-        authors.add(new AuthorDTO(1,"James Bond"));
-        authors.add( new AuthorDTO(2,"APJ Abdul Kalam"));
-        return authors;
+    public List<AuthorDTO> findAll(){
+       return authorService.findAll();
     }
 
     @GetMapping("/{id}")
-    public AuthorDTO getAuthorById(@PathVariable(name = "id") long id){
-        return new AuthorDTO(id,"Rashid");
+    public AuthorDTO findById(@PathVariable(name = "id") long id){
+        return authorService.findById(id);
     }
 
     @PatchMapping("/{id}")
-    public AuthorDTO patchAuthor(@PathVariable(name = "id") long id, @RequestBody Map<String,Object> updates){
-        AuthorDTO authorDTO = new AuthorDTO(1,"James Bond");
+    public AuthorDTO patch(@PathVariable(name = "id") long id, @RequestBody Map<String,Object> updates){
+        AuthorDTO authorDTO = findById(id);
         if(updates.containsKey("id"))
             authorDTO.setId((Long) updates.get("id"));
         if(updates.containsKey("name"))
             authorDTO.setName((String) updates.get("name"));
 
-        return authorDTO;
+        return save(authorDTO);
     }
 
-    @PutMapping("/{id}")
+    @DeleteMapping("/{id}")
     public boolean deleteAuthor(@PathVariable(name = "id") Long id){
-        return true;
+        if(findById(id) == null) return false;
+        return authorService.delete(id);
     }
 
 
